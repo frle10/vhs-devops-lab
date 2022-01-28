@@ -14,15 +14,15 @@ export class Vhs extends BaseEntity {
   @Column()
   genre: string;
 
-  @Column('date')
-  releasedAt: Date;
+  @Column('smallint')
+  releasedAt: number;
 
-  @Column()
+  @Column('smallint')
   rentalPrice: number;
 
-  @Column()
+  @Column('smallint')
   rentalDuration: number;
 
-  @Column()
+  @Column('smallint')
   quantity: number;
 }

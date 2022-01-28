@@ -1,12 +1,15 @@
+import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
-export const typeOrmConfig: TypeOrmModuleOptions = {
+export const typeOrmConfig = (
+  configService: ConfigService,
+): TypeOrmModuleOptions => ({
   type: 'postgres',
-  host: 'localhost',
-  port: 5432,
-  username: 'postgres',
-  password: 'postgres',
+  host: configService.get('DATABASE_HOST'),
+  port: configService.get('DATABASE_PORT'),
+  username: configService.get('DATABASE_USER'),
+  password: configService.get('DATABASE_PASSWORD'),
   database: 'vhs-database',
   entities: [__dirname + '/../**/*.entity.{js,ts}'],
   synchronize: true,
-};
+});

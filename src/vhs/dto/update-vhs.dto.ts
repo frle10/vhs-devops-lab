@@ -1,10 +1,4 @@
-import {
-  IsOptional,
-  IsNotEmpty,
-  IsString,
-  IsISO8601,
-  IsNumber,
-} from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class UpdateVhsDto {
   @IsOptional()
@@ -24,8 +18,8 @@ export class UpdateVhsDto {
 
   @IsOptional()
   @IsNotEmpty()
-  @IsISO8601({ strict: true })
-  releasedAt: Date;
+  @IsNumber()
+  releasedAt: number;
 
   @IsOptional()
   @IsNotEmpty()

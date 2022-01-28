@@ -1,4 +1,4 @@
-import { IsISO8601, IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class CreateVhsDto {
   @IsNotEmpty()
@@ -14,8 +14,8 @@ export class CreateVhsDto {
   genre: string;
 
   @IsNotEmpty()
-  @IsISO8601({ strict: true })
-  releasedAt: Date;
+  @IsNumber()
+  releasedAt: number;
 
   @IsNotEmpty()
   @IsNumber()
