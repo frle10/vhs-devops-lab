@@ -15,15 +15,17 @@ export class VhsRepository extends Repository<Vhs> {
       query.andWhere('vhs.genre = :genre', { genre });
     }
 
-    if (isAvailable) {
-      query.andWhere('vhs.isAvailable = :isAvailable', { isAvailable });
+    if (isAvailable === true) {
+      query.andWhere('vhs.quantity > 0');
+    } else if (isAvailable === false) {
+      query.andWhere('vhs.quantity = 0');
     }
 
     const allVhs = await query.getMany();
     return allVhs;
   }
 
-  createVhs(createVhsDto: CreateVhsDto): Promise<Vhs> {
+  async createVhs(createVhsDto: CreateVhsDto): Promise<Vhs> {
     const {
       title,
       description,
@@ -34,17 +36,17 @@ export class VhsRepository extends Repository<Vhs> {
     } = createVhsDto;
 
     const vhs = new Vhs();
-    const updateVhsDto = new UpdateVhsDto();
 
-    updateVhsDto.title = title;
-    updateVhsDto.description = description;
-    updateVhsDto.genre = genre;
-    updateVhsDto.releasedAt = releasedAt;
-    updateVhsDto.rentalPrice = rentalPrice;
-    updateVhsDto.rentalDuration = rentalDuration;
-    updateVhsDto.isAvailable = true;
+    vhs.title = title;
+    vhs.description = description;
+    vhs.genre = genre;
+    vhs.releasedAt = releasedAt;
+    vhs.rentalPrice = rentalPrice;
+    vhs.rentalDuration = rentalDuration;
+    vhs.quantity = 1;
 
-    return this.updateVhs(vhs, updateVhsDto);
+    await vhs.save();
+    return vhs;
   }
 
   async updateVhs(vhs: Vhs, updateVhsDto: UpdateVhsDto): Promise<Vhs> {
@@ -55,7 +57,7 @@ export class VhsRepository extends Repository<Vhs> {
       releasedAt,
       rentalPrice,
       rentalDuration,
-      isAvailable,
+      quantity,
     } = updateVhsDto;
 
     if (title) vhs.title = title;
@@ -64,7 +66,7 @@ export class VhsRepository extends Repository<Vhs> {
     if (releasedAt) vhs.releasedAt = releasedAt;
     if (rentalPrice) vhs.rentalPrice = rentalPrice;
     if (rentalDuration) vhs.rentalDuration = rentalDuration;
-    if (isAvailable) vhs.isAvailable = isAvailable;
+    if (quantity) vhs.quantity = quantity;
 
     await vhs.save();
     return vhs;

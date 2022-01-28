@@ -27,6 +27,10 @@ export class RentalRepository extends Repository<Rental> {
     rental.rented_at = new Date(new Date().toISOString());
     rental.lateFee = 0;
     rental.user = user;
+
+    vhs.quantity = vhs.quantity - 1;
+    await vhs.save();
+
     rental.vhs = vhs;
 
     await rental.save();
@@ -50,6 +54,10 @@ export class RentalRepository extends Repository<Rental> {
       if (daysLate > 0) {
         rental.lateFee = daysLate * LATE_FEE_COEFFICIENT;
       }
+
+      const vhs = rental.vhs;
+      vhs.quantity = vhs.quantity + 1;
+      await vhs.save();
     }
 
     await rental.save();

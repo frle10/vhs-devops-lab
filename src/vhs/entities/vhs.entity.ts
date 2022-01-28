@@ -24,5 +24,5 @@ export class Vhs extends BaseEntity {
   rentalDuration: number;
 
   @Column()
-  isAvailable: boolean;
+  quantity: number;
 }

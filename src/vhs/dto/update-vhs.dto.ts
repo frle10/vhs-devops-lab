@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsString,
   IsISO8601,
-  IsBoolean,
   IsNumber,
 } from 'class-validator';
 
@@ -40,6 +39,6 @@ export class UpdateVhsDto {
 
   @IsOptional()
   @IsNotEmpty()
-  @IsBoolean()
-  isAvailable: boolean;
+  @IsNumber()
+  quantity: number;
 }
