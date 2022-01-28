@@ -1,26 +1,64 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserRepository } from 'src/auth/user.repository';
+import { VhsRepository } from 'src/vhs/vhs.repository';
+
 import { CreateRentalDto } from './dto/create-rental.dto';
 import { UpdateRentalDto } from './dto/update-rental.dto';
+import { Rental } from './entities/rental.entity';
+import { RentalRepository } from './rental.repository';
+import { GetRentalsFilterDto } from './dto/get-rentals-filter.dto';
 
 @Injectable()
 export class RentalsService {
-  create(createRentalDto: CreateRentalDto) {
-    return 'This action adds a new rental';
+  constructor(
+    @InjectRepository(RentalRepository)
+    private rentalRepository: RentalRepository,
+    @InjectRepository(VhsRepository)
+    private vhsRepository: VhsRepository,
+    @InjectRepository(UserRepository)
+    private userRepository: UserRepository,
+  ) {}
+
+  getRentals(rentalFilterDto: GetRentalsFilterDto): Promise<Rental[]> {
+    return this.rentalRepository.getRentals(rentalFilterDto);
   }
 
-  findAll() {
-    return `This action returns all rentals`;
+  async getRentalById(id: number): Promise<Rental> {
+    const rental = await this.rentalRepository.findOne(id);
+
+    if (!rental) {
+      throw new NotFoundException(`Rental with ID ${id} not found.`);
+    }
+
+    return rental;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} rental`;
+  async createRental(createRentalDto: CreateRentalDto): Promise<Rental> {
+    const vhs = await this.vhsRepository.findOne(createRentalDto.vhsId);
+    const user = await this.userRepository.findOne(createRentalDto.userId);
+
+    return this.rentalRepository.createRental(vhs, user);
   }
 
-  update(id: number, updateRentalDto: UpdateRentalDto) {
-    return `This action updates a #${id} rental`;
+  async updateRental(
+    id: number,
+    updateRentalDto: UpdateRentalDto,
+  ): Promise<Rental> {
+    const rental = await this.getRentalById(id);
+
+    if (!rental) {
+      throw new NotFoundException('The specified rental does not exist.');
+    }
+
+    return this.rentalRepository.updateRental(rental, updateRentalDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} rental`;
+  async deleteRental(id: number): Promise<void> {
+    const result = await this.rentalRepository.delete(id);
+
+    if (!result.affected) {
+      throw new NotFoundException(`Rental with ID ${id} not found.`);
+    }
   }
 }

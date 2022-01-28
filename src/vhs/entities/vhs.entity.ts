@@ -18,5 +18,11 @@ export class Vhs extends BaseEntity {
   releasedAt: Date;
 
   @Column()
+  rentalPrice: number;
+
+  @Column()
+  rentalDuration: number;
+
+  @Column()
   isAvailable: boolean;
 }

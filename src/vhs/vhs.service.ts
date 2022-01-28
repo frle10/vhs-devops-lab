@@ -1,26 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
 import { CreateVhsDto } from './dto/create-vhs.dto';
 import { UpdateVhsDto } from './dto/update-vhs.dto';
+import { VhsRepository } from './vhs.repository';
+import { Vhs } from './entities/vhs.entity';
+import { GetVhsFilterDto } from './dto/get-vhs-filter.dto';
 
 @Injectable()
 export class VhsService {
-  create(createVhsDto: CreateVhsDto) {
-    return 'This action adds a new vh';
+  constructor(
+    @InjectRepository(VhsRepository)
+    private vhsRepository: VhsRepository,
+  ) {}
+
+  getAllVhs(vhsFilterDto: GetVhsFilterDto): Promise<Vhs[]> {
+    return this.vhsRepository.getAllVhs(vhsFilterDto);
   }
 
-  findAll() {
-    return `This action returns all vhs`;
+  async getVhsById(id: number): Promise<Vhs> {
+    const vhs = await this.vhsRepository.findOne(id);
+
+    if (!vhs) {
+      throw new NotFoundException(`VHS with ID ${id} not found.`);
+    }
+
+    return vhs;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} vh`;
+  createVhs(createVhsDto: CreateVhsDto): Promise<Vhs> {
+    return this.vhsRepository.createVhs(createVhsDto);
   }
 
-  update(id: number, updateVhsDto: UpdateVhsDto) {
-    return `This action updates a #${id} vh`;
+  async updateVhs(id: number, updateVhsDto: UpdateVhsDto): Promise<Vhs> {
+    const vhs = await this.getVhsById(id);
+
+    if (!vhs) {
+      throw new NotFoundException(`The specified VHS does not exist.`);
+    }
+
+    return this.vhsRepository.updateVhs(vhs, updateVhsDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} vh`;
+  async deleteVhs(id: number): Promise<void> {
+    const result = await this.vhsRepository.delete(id);
+
+    if (!result.affected) {
+      throw new NotFoundException(`VHS with ID ${id} not found.`);
+    }
   }
 }

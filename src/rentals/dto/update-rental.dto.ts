@@ -1,4 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateRentalDto } from './create-rental.dto';
+import { IsISO8601, IsNotEmpty, IsOptional } from 'class-validator';
 
-export class UpdateRentalDto extends PartialType(CreateRentalDto) {}
+export class UpdateRentalDto {
+  @IsOptional()
+  @IsNotEmpty()
+  @IsISO8601()
+  returned_at: Date;
+}

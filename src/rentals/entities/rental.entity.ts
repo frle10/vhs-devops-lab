@@ -17,15 +17,15 @@ export class Rental extends BaseEntity {
   @Column('date')
   rented_at: Date;
 
-  @Column('date')
-  expired_at: Date;
-
   @Column('date', { nullable: true })
   returned_at: Date;
 
-  @ManyToOne(() => User)
+  @Column()
+  lateFee: number;
+
+  @ManyToOne(() => User, { eager: true })
   user: User;
 
-  @ManyToOne(() => Vhs)
+  @ManyToOne(() => Vhs, { eager: true })
   vhs: Vhs;
 }

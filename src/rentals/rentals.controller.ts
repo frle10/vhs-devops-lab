@@ -1,34 +1,69 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  HttpCode,
+  Query,
+  ValidationPipe,
+} from '@nestjs/common';
 import { RentalsService } from './rentals.service';
 import { CreateRentalDto } from './dto/create-rental.dto';
 import { UpdateRentalDto } from './dto/update-rental.dto';
+import { Rental } from './entities/rental.entity';
+import { GetRentalsFilterDto } from './dto/get-rentals-filter.dto';
 
 @Controller('rentals')
 export class RentalsController {
   constructor(private readonly rentalsService: RentalsService) {}
 
-  @Post()
-  create(@Body() createRentalDto: CreateRentalDto) {
-    return this.rentalsService.create(createRentalDto);
-  }
-
+  /**
+   * Gets all rentals. It is possible to filter by user id.
+   */
   @Get()
-  findAll() {
-    return this.rentalsService.findAll();
+  getRentals(
+    @Query(ValidationPipe) rentalFilterDto: GetRentalsFilterDto,
+  ): Promise<Rental[]> {
+    return this.rentalsService.getRentals(rentalFilterDto);
   }
 
+  /**
+   * Gets the rental with given id if it exists. If not, 404 is returned.
+   */
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rentalsService.findOne(+id);
+  getRentalById(@Param('id', ParseIntPipe) id: number): Promise<Rental> {
+    return this.rentalsService.getRentalById(+id);
   }
 
+  /**
+   * Registers a new rental.
+   */
+  @Post()
+  createRental(@Body() createRentalDto: CreateRentalDto): Promise<Rental> {
+    return this.rentalsService.createRental(createRentalDto);
+  }
+
+  /**
+   * Updates specified rental's data if it exists.
+   */
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRentalDto: UpdateRentalDto) {
-    return this.rentalsService.update(+id, updateRentalDto);
+  updateRental(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateRentalDto: UpdateRentalDto,
+  ): Promise<Rental> {
+    return this.rentalsService.updateRental(+id, updateRentalDto);
   }
 
+  /**
+   * Deletes the rental with specified id if it exists.
+   */
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rentalsService.remove(+id);
+  @HttpCode(204)
+  deleteRental(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.rentalsService.deleteRental(+id);
   }
 }
