@@ -5,11 +5,10 @@ export const typeOrmConfig = (
   configService: ConfigService,
 ): TypeOrmModuleOptions => ({
   type: 'postgres',
-  host: configService.get('DATABASE_HOST'),
-  port: configService.get('DATABASE_PORT'),
-  username: configService.get('DATABASE_USER'),
-  password: configService.get('DATABASE_PASSWORD'),
-  database: 'vhs-database',
+  url:
+    configService.get('NODE_ENV') === 'test'
+      ? configService.get('TEST_DATABASE_URL')
+      : configService.get('DATABASE_URL'),
   entities: [__dirname + '/../**/*.entity.{js,ts}'],
   synchronize: true,
 });

@@ -4,11 +4,13 @@ import { Rental } from './entities/rental.entity';
 import { UpdateRentalDto } from './dto/update-rental.dto';
 import { Vhs } from 'src/vhs/entities/vhs.entity';
 import { User } from 'src/auth/entities/user.entity';
-import { LATE_FEE_COEFFICIENT } from './util';
 import { GetRentalsFilterDto } from './dto/get-rentals-filter.dto';
+import { BadRequestException } from '@nestjs/common';
 
 @EntityRepository(Rental)
 export class RentalRepository extends Repository<Rental> {
+  private readonly LATE_FEE_COEFFICIENT = 20;
+
   async getRentals(rentalFilterDto: GetRentalsFilterDto): Promise<Rental[]> {
     const { userId } = rentalFilterDto;
     const query = this.createQueryBuilder('rental');
@@ -21,7 +23,11 @@ export class RentalRepository extends Repository<Rental> {
     return rentals;
   }
 
-  async createRental(vhs: Vhs, user: User): Promise<Rental> {
+  async createRental(user: User, vhs: Vhs): Promise<Rental> {
+    if (vhs.quantity === 0) {
+      throw new BadRequestException('No VHS tapes for this movie right now');
+    }
+
     const rental = new Rental();
 
     rental.rented_at = new Date(new Date().toISOString());
@@ -46,16 +52,18 @@ export class RentalRepository extends Repository<Rental> {
     if (returned_at) {
       rental.returned_at = returned_at;
 
-      const daysLate = Math.ceil(
+      const daysHeld = Math.ceil(
         (rental.returned_at.getTime() - rental.rented_at.getTime()) /
           (1000 * 3600 * 24),
       );
 
-      if (daysLate > 0) {
-        rental.lateFee = daysLate * LATE_FEE_COEFFICIENT;
+      const vhs = rental.vhs;
+
+      if (daysHeld - vhs.rentalDuration > 0) {
+        rental.lateFee =
+          (daysHeld - vhs.rentalDuration) * this.LATE_FEE_COEFFICIENT;
       }
 
-      const vhs = rental.vhs;
       vhs.quantity = vhs.quantity + 1;
       await vhs.save();
     }

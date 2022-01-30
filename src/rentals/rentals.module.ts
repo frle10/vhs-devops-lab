@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { RentalsService } from './rentals.service';
 import { RentalsController } from './rentals.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { RentalRepository } from './rental.repository';
-import { VhsRepository } from 'src/vhs/vhs.repository';
 import { UserRepository } from '../auth/user.repository';
+import { VhsRepository } from '../vhs/vhs.repository';
 
 @Module({
   imports: [

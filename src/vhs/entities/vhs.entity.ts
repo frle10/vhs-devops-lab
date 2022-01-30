@@ -15,9 +15,12 @@ export class Vhs extends BaseEntity {
   genre: string;
 
   @Column('smallint')
-  releasedAt: number;
+  duration: number;
 
   @Column('smallint')
+  releasedAt: number;
+
+  @Column()
   rentalPrice: number;
 
   @Column('smallint')

@@ -5,7 +5,7 @@ export const admins: AuthCredentialsDto[] = [
 ];
 
 export const users: AuthCredentialsDto[] = [
-  { username: 'frle10', password: '123456' },
-  { username: 'anamarija', password: 'java' },
-  { username: 'zoran', password: 'devops' },
+  { username: 'frle10', password: 'MyPass123' },
+  { username: 'anamarija', password: 'Y0urPaSS456' },
+  { username: 'zoran', password: 'NeKaL0z1Nka' },
 ];

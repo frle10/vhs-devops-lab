@@ -1,23 +1,27 @@
-import { Repository, EntityRepository } from 'typeorm';
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import * as bcrypt from 'bcrypt';
 import {
   InternalServerErrorException,
   ConflictException,
 } from '@nestjs/common';
+import { Repository, EntityRepository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+
+import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { User } from './entities/user.entity';
 import { UserRole } from './entities/user.role.enum';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
+  async signUp(
+    authCredentialsDto: AuthCredentialsDto,
+    role?: UserRole,
+  ): Promise<void> {
     const { username, password } = authCredentialsDto;
 
     const user = new User();
     user.username = username;
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
-    user.role = UserRole.USER;
+    user.role = role ? role : UserRole.USER;
     user.dateCreated = new Date(new Date().toISOString());
 
     try {

@@ -4,5 +4,5 @@ export class UpdateRentalDto {
   @IsOptional()
   @IsNotEmpty()
   @IsISO8601()
-  returned_at: Date;
+  returned_at?: Date;
 }

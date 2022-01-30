@@ -30,6 +30,7 @@ export class VhsRepository extends Repository<Vhs> {
       title,
       description,
       genre,
+      duration,
       releasedAt,
       rentalPrice,
       rentalDuration,
@@ -40,6 +41,7 @@ export class VhsRepository extends Repository<Vhs> {
     vhs.title = title;
     vhs.description = description;
     vhs.genre = genre;
+    vhs.duration = duration;
     vhs.releasedAt = releasedAt;
     vhs.rentalPrice = rentalPrice;
     vhs.rentalDuration = rentalDuration;
@@ -54,6 +56,7 @@ export class VhsRepository extends Repository<Vhs> {
       title,
       description,
       genre,
+      duration,
       releasedAt,
       rentalPrice,
       rentalDuration,
@@ -63,6 +66,7 @@ export class VhsRepository extends Repository<Vhs> {
     if (title) vhs.title = title;
     if (description) vhs.description = description;
     if (genre) vhs.genre = genre;
+    if (duration) vhs.duration = duration;
     if (releasedAt) vhs.releasedAt = releasedAt;
     if (rentalPrice) vhs.rentalPrice = rentalPrice;
     if (rentalDuration) vhs.rentalDuration = rentalDuration;

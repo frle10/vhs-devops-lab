@@ -4,35 +4,40 @@ export class UpdateVhsDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  title: string;
+  title?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  description: string;
+  description?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  genre: string;
+  genre?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsNumber()
-  releasedAt: number;
+  duration?: number;
 
   @IsOptional()
   @IsNotEmpty()
   @IsNumber()
-  rentalPrice: number;
+  releasedAt?: number;
 
   @IsOptional()
   @IsNotEmpty()
   @IsNumber()
-  rentalDuration: number;
+  rentalPrice?: number;
 
   @IsOptional()
   @IsNotEmpty()
   @IsNumber()
-  quantity: number;
+  rentalDuration?: number;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  quantity?: number;
 }

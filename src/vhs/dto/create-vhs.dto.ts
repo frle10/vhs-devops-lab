@@ -15,6 +15,10 @@ export class CreateVhsDto {
 
   @IsNotEmpty()
   @IsNumber()
+  duration: number;
+
+  @IsNotEmpty()
+  @IsNumber()
   releasedAt: number;
 
   @IsNotEmpty()
