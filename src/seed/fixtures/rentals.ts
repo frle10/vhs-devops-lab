@@ -2,7 +2,7 @@ import { CreateRentalDto } from '../../rentals/dto/create-rental.dto';
 
 export const rentals: CreateRentalDto[] = [
   {
-    userId: 3,
+    userId: 1,
     vhsId: 1,
   },
   { userId: 2, vhsId: 3 },

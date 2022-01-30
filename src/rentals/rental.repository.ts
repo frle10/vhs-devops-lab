@@ -53,7 +53,8 @@ export class RentalRepository extends Repository<Rental> {
       rental.returned_at = returned_at;
 
       const daysHeld = Math.ceil(
-        (rental.returned_at.getTime() - rental.rented_at.getTime()) /
+        (new Date(rental.returned_at).getTime() -
+          new Date(rental.rented_at).getTime()) /
           (1000 * 3600 * 24),
       );
 
