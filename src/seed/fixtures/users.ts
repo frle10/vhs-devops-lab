@@ -1,7 +1,7 @@
 import { AuthCredentialsDto } from '../../auth/dto/auth-credentials.dto';
 
 export const admins: AuthCredentialsDto[] = [
-  { username: 'admin', password: 'admin' },
+  { username: 'admin', password: 'Admin123' },
 ];
 
 export const users: AuthCredentialsDto[] = [

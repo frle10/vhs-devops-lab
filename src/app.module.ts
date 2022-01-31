@@ -18,9 +18,9 @@ import { SeedModule } from './seed/seed.module';
       useFactory: async (configService: ConfigService) =>
         typeOrmConfig(configService),
     }),
+    AuthModule,
     VhsModule,
     RentalsModule,
-    AuthModule,
     SeedModule,
   ],
 })
