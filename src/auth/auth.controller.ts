@@ -12,6 +12,9 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  /**
+   * Route for user registration.
+   */
   @Post('/signup')
   signUp(
     @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
@@ -19,6 +22,9 @@ export class AuthController {
     return this.authService.signUp(authCredentialsDto);
   }
 
+  /**
+   * Route for user login.
+   */
   @Post('/signin')
   @HttpCode(200)
   signIn(
