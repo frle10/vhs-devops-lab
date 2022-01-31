@@ -55,10 +55,6 @@ export class RentalsService {
   }
 
   async deleteRental(id: number): Promise<void> {
-    const result = await this.rentalRepository.delete(id);
-
-    if (!result.affected) {
-      throw new NotFoundException(`Rental with ID ${id} not found`);
-    }
+    return this.rentalRepository.deleteRental(id);
   }
 }

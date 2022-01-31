@@ -11,6 +11,8 @@ import {
   Query,
   ValidationPipe,
   UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 
 import { RentalsService } from './rentals.service';
@@ -33,6 +35,7 @@ export class RentalsController {
    */
   @Get()
   @Roles(UserRole.ADMIN)
+  @UseInterceptors(ClassSerializerInterceptor)
   getRentals(
     @Query(ValidationPipe) rentalFilterDto: GetRentalsFilterDto,
   ): Promise<Rental[]> {
@@ -44,6 +47,7 @@ export class RentalsController {
    */
   @Get(':id')
   @Roles(UserRole.ADMIN)
+  @UseInterceptors(ClassSerializerInterceptor)
   getRentalById(@Param('id', ParseIntPipe) id: number): Promise<Rental> {
     return this.rentalsService.getRentalById(+id);
   }
@@ -53,6 +57,7 @@ export class RentalsController {
    */
   @Post()
   @Roles(UserRole.ADMIN)
+  @UseInterceptors(ClassSerializerInterceptor)
   createRental(@Body() createRentalDto: CreateRentalDto): Promise<Rental> {
     return this.rentalsService.createRental(createRentalDto);
   }
@@ -62,6 +67,7 @@ export class RentalsController {
    */
   @Patch(':id')
   @Roles(UserRole.ADMIN)
+  @UseInterceptors(ClassSerializerInterceptor)
   updateRental(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRentalDto: UpdateRentalDto,

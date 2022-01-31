@@ -5,7 +5,7 @@ import { UpdateRentalDto } from './dto/update-rental.dto';
 import { Vhs } from 'src/vhs/entities/vhs.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { GetRentalsFilterDto } from './dto/get-rentals-filter.dto';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 @EntityRepository(Rental)
 export class RentalRepository extends Repository<Rental> {
@@ -19,7 +19,10 @@ export class RentalRepository extends Repository<Rental> {
       query.andWhere('rental.userId = :userId', { userId });
     }
 
-    const rentals = await query.getMany();
+    const rentals = await query
+      .leftJoinAndSelect('rental.user', 'user')
+      .leftJoinAndSelect('rental.vhs', 'vhs')
+      .getMany();
     return rentals;
   }
 
@@ -71,5 +74,22 @@ export class RentalRepository extends Repository<Rental> {
 
     await rental.save();
     return rental;
+  }
+
+  async deleteRental(id: number): Promise<void> {
+    const rental = await this.findOne(id);
+
+    if (rental) {
+      const vhs = rental.vhs;
+      vhs.quantity = vhs.quantity + 1;
+
+      await vhs.save();
+    }
+
+    const result = await this.delete(id);
+
+    if (!result.affected) {
+      throw new NotFoundException(`Rental with ID ${id} not found`);
+    }
   }
 }
