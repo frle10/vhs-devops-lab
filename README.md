@@ -1,73 +1,34 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+### VHS
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+During implementation of the VHS Rental system, I assumed the following rules:
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- there can be more than one VHS cassette for a particular movie available (so VHS model has a quantity field, which is a number), this means that the same VHS CAN be rented on the same date more than once, as long
+  as the quantity is greater than 0 (this is validated on rent request)
+- when the rental is created, its returned_at field is NULL at first, but upon returning a VHS, the user triggers an update PATCH method to that rental which sets the returned_at date and at the same time updates the late_fee if neccessary
+- authentication has been implemented using JWT, so there is no logout route, just login and register
 
-## Description
+To start the app, you should clone this repo to your local machine and do the following in your terminal:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- position yourself to project directory
+- run "yarn install" to install project dependencies
+- run "docker compose up" to start a PostgreSQL database
+- run "yarn start:dev:seed" to start the app in development mode and also seed the database on startup
 
-## Installation
+In case you want to run e2e tests, you should first run the docker-compose.test.yml file because it will start a database that's just for testing:
 
-```bash
-$ npm install
-```
+- docker compose -f docker-compose.test.yml up
+- yarn test:e2e
 
-## Running the app
+### Docker commands
 
-```bash
-# development
-$ npm run start
+Build Nexus server: docker build -t my-nexus-build -f Dockerfile.nexus .
+Start Nexus server: docker run -d -p 18081:8081 -p 18082:8082 --name nexus --restart always -v nexus-data:/opt/nexus/sonatype-work my-nexus-build
 
-# watch mode
-$ npm run start:dev
+Build VHS app: docker build -t vhs-app .
+Run VHS app: docker run -d -p 3000:3000 --name vhs-app vhs-app
 
-# production mode
-$ npm run start:prod
-```
+### Push VHS app to Nexus registry:
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+- docker login 127.0.0.1:18082
+- docker tag vhs-rental 127.0.0.1:18082/vhs-rental:latest
+- docker push 127.0.0.1:18082/vhs-rental:latest

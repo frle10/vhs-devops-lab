@@ -1,69 +1,35 @@
-FROM registry.access.redhat.com/ubi8/ubi
+FROM registry.access.redhat.com/ubi8/ubi:8.3
 
-LABEL name="Nexus Repository Manager" \
-      maintainer="Sonatype <support@sonatype.com>" \
-      vendor=Sonatype \
-      version="3.37.3-02" \
-      release="3.37.3" \
-      url="https://sonatype.com" \
-      summary="The Nexus Repository Manager server \
-          with universal support for popular component formats." \
-      description="The Nexus Repository Manager server \
-          with universal support for popular component formats." \
-      run="docker run -d --name NAME \
-          -p 8081:8081 \
-          IMAGE" \
-      stop="docker stop NAME" \
-      com.sonatype.license="Apache License, Version 2.0" \
-      com.sonatype.name="Nexus Repository Manager base image" \
-      io.k8s.description="The Nexus Repository Manager server \
-          with universal support for popular component formats." \
-      io.k8s.display-name="Nexus Repository Manager" \
-      io.openshift.expose-services="8081:8081" \
-      io.openshift.tags="Sonatype,Nexus,Repository Manager"
+LABEL name="Nexus Container Registry" maintainer="Ivan Skorupan <ivan.skorupan@fer.hr>"
 
-ARG NEXUS_VERSION=3.37.3-02
+ENV NEXUS_HOME=/opt/nexus
+ENV NEXUS_VERSION=3.37.3-02
+
+WORKDIR ${NEXUS_HOME}
+
 ARG NEXUS_DOWNLOAD_URL=https://download.sonatype.com/nexus/3/nexus-${NEXUS_VERSION}-unix.tar.gz
-ARG NEXUS_DOWNLOAD_SHA256_HASH=c1db431908c5a76b44015c555d6ef4517abf0a86844faffee0f5d6c62359312d
 
-# configure nexus runtime
-ENV SONATYPE_DIR=/opt/sonatype
-ENV NEXUS_HOME=${SONATYPE_DIR}/nexus \
-    NEXUS_DATA=/nexus-data \
-    NEXUS_CONTEXT='' \
-    SONATYPE_WORK=${SONATYPE_DIR}/sonatype-work \
-    DOCKER_TYPE='3x-docker'
+# download and unpack Nexus binaries
+RUN curl -L -O ${NEXUS_DOWNLOAD_URL} \
+  && tar -xvzf nexus-${NEXUS_VERSION}-unix.tar.gz \
+  && rm -rf nexus-${NEXUS_VERSION}-unix.tar.gz
 
-ARG NEXUS_REPOSITORY_MANAGER_COOKBOOK_VERSION="release-0.5.20210628-162332.70a6cb6"
-ARG NEXUS_REPOSITORY_MANAGER_COOKBOOK_URL="https://github.com/sonatype/chef-nexus-repository-manager/releases/download/${NEXUS_REPOSITORY_MANAGER_COOKBOOK_VERSION}/chef-nexus-repository-manager.tar.gz"
-
-ADD solo.json.erb /var/chef/solo.json.erb
-
-# Install using chef-solo
-# Chef version locked to avoid needing to accept the EULA on behalf of whomever builds the image
-RUN yum install -y --disableplugin=subscription-manager hostname procps \
-    && curl -L https://omnitruck.chef.io/install.sh | bash -s -- -v 14.12.9 \
-    && /opt/chef/embedded/bin/erb /var/chef/solo.json.erb > /var/chef/solo.json \
-    && chef-solo \
-       --recipe-url ${NEXUS_REPOSITORY_MANAGER_COOKBOOK_URL} \
-       --json-attributes /var/chef/solo.json \
-    && rpm -qa *chef* | xargs rpm -e \
-    && rm -rf /etc/chef \
-    && rm -rf /opt/chefdk \
-    && rm -rf /var/cache/yum \
-    && rm -rf /var/chef \
-    && yum clean all
-    
 # download and install openjdk 8
-RUN curl -O https://vault.centos.org/8.3.2011/AppStream/x86_64/os/Packages/java-1.8.0-openjdk-headless-1.8.0.282.b08-2.el8_3.x86_64.rpm \
+# downloads the rpm java package, installs it and then deletes the now unnecessary package rpm
+RUN curl -L -O https://vault.centos.org/8.3.2011/AppStream/x86_64/os/Packages/java-1.8.0-openjdk-headless-1.8.0.282.b08-2.el8_3.x86_64.rpm \
     && yum localinstall -y --disableplugin=subscription-manager java-1.8.0-openjdk-headless-1.8.0.282.b08-2.el8_3.x86_64.rpm \
     && rm -rf java-1.8.0-openjdk-headless-1.8.0.282.b08-2.el8_3.x86_64.rpm
 
-VOLUME ${NEXUS_DATA}
-
-EXPOSE 8081
+RUN useradd -r -s /bin/false -u 200 -c "Nexus Repository Manager user" -d ${NEXUS_HOME} nexus && \
+    usermod -a -G nexus nexus
+  
 USER nexus
 
-ENV INSTALL4J_ADD_VM_PARAMS="-Xms2703m -Xmx2703m -XX:MaxDirectMemorySize=2703m -Djava.util.prefs.userRoot=${NEXUS_DATA}/javaprefs"
+VOLUME ${NEXUS_HOME}/sonatype-work
 
-CMD ["sh", "-c", "${SONATYPE_DIR}/start-nexus-repository-manager.sh"]
+EXPOSE 8081
+EXPOSE 8082
+
+ENV INSTALL4J_ADD_VM_PARAMS="-Xms2703m -Xmx2703m -XX:MaxDirectMemorySize=2703m -Djava.util.prefs.userRoot=${NEXUS_HOME}/sonatype-work/javaprefs"
+
+CMD ["sh", "-c", "${NEXUS_HOME}/nexus-${NEXUS_VERSION}/bin/nexus run"]
