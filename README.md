@@ -64,6 +64,7 @@ Thing I could still improve but would take extra time:
 - I think I could have handled deletion of VHS and rentals better... but I will say this task is quite extensive and I decided to call this a finished solution since I did implement all the requirements asked of me in the task :)
 - the yarn start:dev:seed script would not work on Windows because of SEED_DB=1 part in the script.. to fix that, I could use cross-env package, but I guess not everything has to be perfect, and who uses Windows anyway?? :P
 - if I was deploying this to production somewhere, I wouldn't push my .env file like this, but I'm just including it so it's easier for you to test stuff
+- it's likely that you will find some unformatted and not very bussiness oriented error messages because I don't think I covered all of them
 
 Furthemore on this last point... When I delete a rental, I first take its VHS property to increase VHS quantity by one, after which the rental can be deleted safely. But if VHS is successfully updated and the rental is NOT deleted, then
 there is an incorrect state in the database. So, this should probably be made an atomic operation.
