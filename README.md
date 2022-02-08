@@ -43,7 +43,9 @@ Start Nexus server:
 Build VHS app:
 
 - docker build -t vhs-app .
-  Run VHS app:
+
+Run VHS app:
+
 - docker run -d -p 3000:3000 --name vhs-app vhs-app
 
 ### Push VHS app to Nexus registry once it's started:
