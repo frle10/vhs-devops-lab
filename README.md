@@ -26,7 +26,7 @@ In case you want to run e2e tests, you should first run the docker-compose.test.
 
 There are some extra features that weren't necessary but I included them:
 
-- the Postman collection has requests for all controller methods, not just the ones listed in the task
+- the Postman collection has requests for all controller methods, not just the ones listed in the task (the collection is in JSON format in the repository)
 - rentals can be filtered by user id, and VHS tapes can be filtered by genre and availability, I thought this could come in handy for system users
 - docker compose files
 
@@ -62,6 +62,8 @@ Thing I could still improve but would take extra time:
 - I could make a script for database seeding that can be run separately from application, so that it wasn't neccessary to run both at the same time like now
 - instead of java-devel package I used java-headless, because I had problems with the former... however, if you look in official nexus Dockerfile, they also use java-headless and not devel
 - I think I could have handled deletion of VHS and rentals better... but I will say this task is quite extensive and I decided to call this a finished solution since I did implement all the requirements asked of me in the task :)
+- the yarn start:dev:seed script would not work on Windows because of SEED_DB=1 part in the script.. to fix that, I could use cross-env package, but I guess not everything has to be perfect, and who uses Windows anyway?? :P
+- if I was deploying this to production somewhere, I wouldn't push my .env file like this, but I'm just including it so it's easier for you to test stuff
 
 Furthemore on this last point... When I delete a rental, I first take its VHS property to increase VHS quantity by one, after which the rental can be deleted safely. But if VHS is successfully updated and the rental is NOT deleted, then
 there is an incorrect state in the database. So, this should probably be made an atomic operation.
