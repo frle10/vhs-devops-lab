@@ -32,11 +32,19 @@ There are some extra features that weren't necessary but I included them:
 
 ### Docker commands
 
-Build Nexus server: docker build -t my-nexus-build -f Dockerfile.nexus .
-Start Nexus server: docker run -d -p 18081:8081 -p 18082:8082 --name nexus --restart always -v nexus-data:/opt/nexus/sonatype-work my-nexus-build
+Build Nexus server:
 
-Build VHS app: docker build -t vhs-app .
-Run VHS app: docker run -d -p 3000:3000 --name vhs-app vhs-app
+- docker build -t my-nexus-build -f Dockerfile.nexus .
+
+Start Nexus server:
+
+- docker run -d -p 18081:8081 -p 18082:8082 --name nexus --restart always -v nexus-data:/opt/nexus/sonatype-work my-nexus-build
+
+Build VHS app:
+
+- docker build -t vhs-app .
+  Run VHS app:
+- docker run -d -p 3000:3000 --name vhs-app vhs-app
 
 ### Push VHS app to Nexus registry once it's started:
 
